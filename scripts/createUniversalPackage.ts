@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync, chmodSync } from "fs";
 import { resolve } from "path";
 
 const distDir = resolve("dist");
@@ -23,3 +23,7 @@ writeFileSync(cjsPath, JSON.stringify({ type: "commonjs" }));
 // To minimize breaking changes from pre-universal package time.
 const indexPath = resolve(distDir, "index.js");
 writeFileSync(indexPath, `import "./esm/index.js";`);
+
+// The MCP Inspector spawns dist/esm/index.js directly (not via `node`),
+// so it needs the execute bit even though tsc doesn't set it.
+chmodSync(resolve(distDir, "esm", "index.js"), 0o755);
